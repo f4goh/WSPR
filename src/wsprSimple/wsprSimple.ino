@@ -22,7 +22,7 @@ Adafruit_SSD1306 lcd;
 //time_t prevDisplay = 0; // when the digital clock was displayed
 
 
-#define LED 2
+#define LED 8
 #define W_CLK 13
 #define FQ_UD 10
 #define RESET 9  // or 10
