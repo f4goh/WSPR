@@ -32,11 +32,14 @@
 
 - Copy libraries files into Arduino/library folder
 
-- run WSPR encoder.exe put your callsign, locator and power and generate symbols.
+- run wspr.bat put your callsign, locator and power and generate symbols.
 
-![symbols](img/symbols.png  "symbols")
+![symbols](img/wspr_gen.png  "wspr_gen")
 
-- Paste symbols into WsprSimple.ino
+- Paste symbols from symbols.txt into WsprSimple.ino with commas
+
+![symbols](img/wspr_symbols.png  "wspr_symbols")
+
 
 ```c++
 	int wsprSymb[] = {3, 3, 0, 0, 0, 2, 0, 2, 1, 2, 0, 2, 3, 3, 1, 0, 2, 0, 3, 0, 0, 1, 2, 1, 1, 3, 1, 0, 2, 0, 0, 2, 0, 2, 3, 2, 0, 1, 2, 3, 0, 0, 0, 0,
@@ -68,6 +71,12 @@ adjust frequency "factor" offset if there is outside the WSPR band
 - Enjoy WSPR beacon.
 
 ![map](img/wspr.png  "map")
+
+the src directory contains other programs like :
+
+- Rtty, PSK, QPSK, Hellschreiber, JT65, JT9, WSPR and FT8 encoding exemples
+
+- FSQCall beacon soon
 
 73
 

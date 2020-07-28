@@ -1,7 +1,9 @@
-/* Wspr Simple
+/*rtcOled
   Anthony LE CREN F4GOH@orange.fr
   Created 8/2/2019
   RTC and oled clock test
+  no ad9850 and no bs170 connected !
+  for breadboard only
 */
 
 //#define DEBUG

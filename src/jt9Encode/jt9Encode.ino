@@ -1,43 +1,43 @@
-/* Wspr Simple
+/* jt9 with encode
   Anthony LE CREN F4GOH@orange.fr
-  Created 8/2/2019
-
+  Created 26/7/2020
+  the program send jt9 sequence every 2 minutes  
+  In serial Monitor
+  key 'h' to set up RTC
+  key 'w' to jt9 wspr sequence 85 symbols
 */
 
-//#define DEBUG
 
 #include <SPI.h>
 #include <EEPROM.h>
-//#include  <TimeLib.h>
 #include <DS3232RTC.h> //http://github.com/JChristensen/DS3232RTC
 #include <Wire.h>
 #include <Time.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-#include <stdio.h>
+#include <JTEncode.h>
 
 
 Adafruit_SSD1306 lcd;
 
-//time_t prevDisplay = 0; // when the digital clock was displayed
-
+JTEncode jtencode;
 
 #define LED 8
 #define W_CLK 13
 #define FQ_UD 10
-#define RESET 9
-#define frequence 7040100
+#define RESET 9 
+#define FREQUENCY 3570100  //base freq  
+#define MESSAGE "CQ F4GOH JN07"
+#define JT9_TONE_SPACING        1.736f
+#define JT9_DELAY               576
 
-long factor = -1500;
+
+long factor = -1500;		//adjust frequency to band
 int secPrec = 0;
 
-int wsprSymb[] = {3, 3, 0, 0, 0, 2, 0, 2, 1, 2, 0, 2, 3, 3, 1, 0, 2, 0, 3, 0, 0, 1, 2, 1, 1, 3, 1, 0, 2, 0, 0, 2, 0, 2, 3, 2, 0, 1, 2, 3, 0, 0, 0, 0,
-                  2, 2, 3, 0, 1, 3, 2, 0, 3, 3, 2, 3, 2, 2, 2, 1, 3, 0, 1, 0, 2, 0, 2, 1, 1, 2, 1, 0, 3, 2, 1, 2, 3, 0, 0, 1, 2, 0, 1, 0, 1, 3, 0, 0,
-                  0, 1, 3, 2, 1, 2, 1, 2, 2, 2, 3, 0, 0, 2, 2, 2, 3, 2, 0, 1, 2, 0, 3, 3, 1, 2, 3, 3, 0, 2, 1, 3, 0, 3, 2, 2, 0, 3, 3, 1, 2, 0, 0, 0,
-                  2, 1, 0, 1, 2, 0, 3, 3, 2, 2, 0, 2, 2, 2, 2, 1, 3, 2, 1, 0, 1, 1, 2, 0, 0, 3, 1, 2, 2, 2
-                 };
-
 tmElements_t tm;
+
+uint8_t jt9Symb[JT9_SYMBOL_COUNT];
 
 void setup() {
 
@@ -45,31 +45,41 @@ void setup() {
   Serial.begin(115200);
   Serial.print("hello");
   pinMode(LED, OUTPUT);
- lcd.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3C (for the 128x32)
+  lcd.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3C (for the 128x32)
   lcd.clearDisplay();
   lcd.setTextSize(2);
   lcd.setTextColor(WHITE);
   lcd.setCursor(0, 0);
-  lcd.println(F("WSPR"));
+  lcd.println(F("JT9"));
   lcd.setCursor(0, 16);    //x y
   lcd.print(F("F4GOH 2019"));
   lcd.display();
   delay(1000);
-  //delay(1000);
   initDds();
 
   setfreq(0, 0);
   setfreq(0, 0);
-  //setfreq((double)frequence, 0);
-
-
-
+  
+    
+  memset(jt9Symb, 0, JT9_SYMBOL_COUNT);   //clear memory
+  jtencode.jt9_encode(MESSAGE, jt9Symb);  
+  int n, lf;      
+  lf = 0;
+  for (n = 0; n < JT9_SYMBOL_COUNT; n++) {   //print symbols on serial monitor
+    if (lf % 16 == 0) {
+      Serial.println();
+      Serial.print(n);
+      Serial.print(": ");
+    }
+    lf++;
+    Serial.print(jt9Symb[n]);
+    Serial.print(',');
+  }
+  Serial.println();
 }
 
 
-//main loop
-
-void loop() {       //faire un debug serial avec la led
+void loop() {
   char c;
   if (Serial.available() > 0) {
     c = Serial.read();
@@ -78,15 +88,15 @@ void loop() {       //faire un debug serial avec la led
       majRtc();
     }
     if (c == 'w') {
-      sendWspr(frequence);
+      sendJt9(FREQUENCY);
     }
-    // digitalWrite(LED, LOW);
   }
   RTC.read(tm);
 
   if ((tm.Minute % 2) == 0 && tm.Second == 0) {
-    sendWspr(frequence);
+    sendJt9(FREQUENCY);
   }
+
   if (secPrec != tm.Second) {
     Serial.print(tm.Hour);
     Serial.print(":");
@@ -100,9 +110,9 @@ void loop() {       //faire un debug serial avec la led
     lcd.print(heure);
     lcd.display();
     secPrec = tm.Second;
+    if (tm.Second % 2 == 0) digitalWrite(LED, digitalRead(LED) ^ 1);
   }
   delay(10);
-
 }
 
 
@@ -148,15 +158,15 @@ void setfreq(double f, uint16_t p) {
 
 
 
-void sendWspr(long freqWspr) {
+void sendJt9(long freq) {
 
   int a = 0;
-  for (int element = 0; element < 162; element++) {    // For each element in the message
-    a = int(wsprSymb[element]); //   get the numerical ASCII Code
-    setfreq((double) freqWspr + (double) a * 1.4548, 0);
-    delay(682);
+  for (int element = 0; element < JT9_SYMBOL_COUNT; element++) {    // For each element in the message
+    a = int(jt9Symb[element]); //   get the numerical ASCII Code
+    setfreq((double) freq + (double) a * JT9_TONE_SPACING, 0);
+    delay(JT9_DELAY);
     Serial.print(a);
-    digitalWrite(LED, digitalRead(LED) ^1);
+    digitalWrite(LED, digitalRead(LED) ^ 1);
   }
   setfreq(0, 0);
   Serial.println("EOT");
