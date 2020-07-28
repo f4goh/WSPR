@@ -5,7 +5,7 @@
   The transmission mode is compatible PSK or QPSK at 31,63 or 125 bps
   The sensor is a ds18s20 on pinout 7
   In serial Monitor
-  key 's' to set up RTC
+  key 'h' to set up RTC
   key 'w' to send test PSK string "....hello 1234 test 1234 test....\n" in each mode and speed
 */
 

@@ -5,7 +5,7 @@
   The transmission mode is RTTY (45.45 bauds, 2 bits stop, shift 170Hz)
   The sensor is a ds18s20 on pinout 7
   In serial Monitor
-  key 's' to set up RTC
+  key 'h' to set up RTC
   key 'w' to send test RTTY string "....hello 1234 test 1234 test....\n"
 */
 
