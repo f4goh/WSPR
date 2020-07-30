@@ -1,5 +1,7 @@
 **WSPR beacon on breadboard**
 
+[link to hamprojects web site](https://hamprojects.wordpress.com/2019/06/02/wspr-beacon/)
+
 *f4goh@orange.fr*
 
 ![wspr](img/IMG_20190323_135115.jpg  "wspr finsished")
@@ -76,7 +78,12 @@ the src directory contains other programs like :
 
 - Rtty, PSK, QPSK, Hellschreiber, JT65, JT9, WSPR and FT8 encoding exemples
 
-- FSQCall beacon soon
+- And [FSQCall](https://www.qsl.net/zl1bpu/MFSK/FSQweb.htm) beacon test
+
+![fsq](img/FSQCall.png  "fsq")
+
+- Telemetry is saved into FSQCALv042\Shared\data.tlm
+- File can be changed into FSQEncode.ino
 
 73
 
