@@ -29,7 +29,7 @@ JTEncode jtencode;
 #define FREQUENCY 3570100  //base freq  
 #define CALL "F4GOH"
 #define LOCATOR "JN07"
-#define DBM "20"
+#define DBM 20
 #define WSPR_TONE_SPACING       1.4548
 #define WSPR_DELAY              682  
 
