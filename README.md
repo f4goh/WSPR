@@ -4,7 +4,7 @@
 
 *f4goh@orange.fr*
 
-**Add FST4W and new library for OLED**
+**Add FST4W for Antonio (IK1HGI) and new library for OLED**
 
 ![wspr](img/IMG_20190323_135115.jpg  "wspr finsished")
 
