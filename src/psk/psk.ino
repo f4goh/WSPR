@@ -1,6 +1,6 @@
 /* PSK
   Anthony LE CREN F4GOH@orange.fr
-  Created 26/7/2020
+  Created 16/7/2021
   the program send temperature every 2 minutes in BPSK 31
   The transmission mode is compatible PSK or QPSK at 31,63 or 125 bps
   The sensor is a ds18s20 on pinout 7
@@ -13,8 +13,7 @@
 #include <DS3232RTC.h> //http://github.com/JChristensen/DS3232RTC
 #include <Wire.h>     //for rtc and oled display
 #include <Time.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
+#include "SSD1306AsciiWire.h"
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
@@ -32,7 +31,7 @@ int secPrec = 0;
 tmElements_t tm;
 
 
-Adafruit_SSD1306 lcd;
+SSD1306AsciiWire oled;  //afficheur oled;;
 OneWire  ds(SENSOR);  // on pin 7 (a 3.3k or 4.7K resistor is necessary)
 DallasTemperature sensors(&ds);
 
@@ -41,16 +40,16 @@ void setup() {
   Serial.print("hello");
   pinMode(LED, OUTPUT);
   sensors.begin();
-  lcd.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3C (for the 128x32)
-  lcd.clearDisplay();
-  lcd.setTextSize(2);
-  lcd.setTextColor(WHITE);
-  lcd.setCursor(0, 0);
-  lcd.println(F("PSK"));
-  lcd.setCursor(0, 16);    //x y
-  lcd.print(F("F4GOH 2020"));
-  lcd.display();
-  delay(1000);
+  oled.begin(&Adafruit128x64, 0x3C);
+  oled.setFont(TimesNewRoman16_bold);
+  oled.clear();
+  oled.setCursor(5, 0);
+  oled.println(F("PSK/QPSK"));
+  oled.setCursor(10, 3);   //x y
+  oled.print(F("F4GOH 2021"));
+  oled.setFont(fixednums15x31);
+  delay(3000);
+  oled.clear();
   initDds();
   setfreq(0, 0);
   setfreq(0, 0);
@@ -100,12 +99,10 @@ void loop() {
     Serial.print(tm.Minute);
     Serial.print(":");
     Serial.println(tm.Second);
-    lcd.clearDisplay();
-    lcd.setCursor(0, 0);
     char heure[10];
     sprintf(heure, "%02d:%02d:%02d", tm.Hour, tm.Minute, tm.Second);
-    lcd.print(heure);
-    lcd.display();
+    oled.setCursor(0, 0);
+    oled.print(heure);
     secPrec = tm.Second;
     if (tm.Second % 2 == 0) digitalWrite(LED, digitalRead(LED) ^ 1);
   }

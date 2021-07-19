@@ -1,6 +1,6 @@
 /* ft8 with encode
   Anthony LE CREN F4GOH@orange.fr
-  Created 26/7/2020
+  Created 16/7/2021
   the program send ft8 sequence every 2 minutes  
   In serial Monitor
   key 'h' to set up RTC
@@ -13,12 +13,11 @@
 #include <DS3232RTC.h> //http://github.com/JChristensen/DS3232RTC
 #include <Wire.h>
 #include <Time.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
+#include "SSD1306AsciiWire.h"
 #include <JTEncode.h>
 
 
-Adafruit_SSD1306 lcd;
+SSD1306AsciiWire oled;  //afficheur oled;
 
 JTEncode jtencode;
 
@@ -45,16 +44,16 @@ void setup() {
   Serial.begin(115200);
   Serial.print("hello");
   pinMode(LED, OUTPUT);
-  lcd.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3C (for the 128x32)
-  lcd.clearDisplay();
-  lcd.setTextSize(2);
-  lcd.setTextColor(WHITE);
-  lcd.setCursor(0, 0);
-  lcd.println(F("FT8"));
-  lcd.setCursor(0, 16);    //x y
-  lcd.print(F("F4GOH 2019"));
-  lcd.display();
-  delay(1000);
+  oled.begin(&Adafruit128x64, 0x3C);
+  oled.setFont(TimesNewRoman16_bold);
+  oled.clear();
+  oled.setCursor(5, 0);
+  oled.println(F("FT8"));
+  oled.setCursor(10,3);    //x y
+  oled.print(F("F4GOH 2021"));
+  oled.setFont(fixednums15x31);  
+  delay(3000);
+  oled.clear();  
   initDds();
 
   setfreq(0, 0);
@@ -102,13 +101,11 @@ void loop() {
     Serial.print(":");
     Serial.print(tm.Minute);
     Serial.print(":");
-    Serial.println(tm.Second);
-    lcd.clearDisplay();
-    lcd.setCursor(0, 0);
+    Serial.println(tm.Second);  
     char heure[10];
     sprintf(heure, "%02d:%02d:%02d", tm.Hour, tm.Minute, tm.Second);
-    lcd.print(heure);
-    lcd.display();
+    oled.setCursor(0, 0);
+    oled.print(heure);
     secPrec = tm.Second;
     if (tm.Second % 2 == 0) digitalWrite(LED, digitalRead(LED) ^ 1);
   }

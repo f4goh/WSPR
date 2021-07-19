@@ -1,7 +1,7 @@
-/* Wspr RTC with lcd and Txing on Timer1 IRQ
+/* Wspr RTC with oled and Txing on Timer1 IRQ
   Anthony LE CREN F4GOH@orange.fr
-  Created 27/1/2021
-  if add wsprencode then ram overflow
+  Created 16/7/2021
+  need to test wsprencode with it
 */
 
 #include <SPI.h>
@@ -9,8 +9,7 @@
 #include <DS3232RTC.h>
 #include <Wire.h>
 #include <Time.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
+#include "SSD1306AsciiWire.h"
 #include <stdio.h>
 
 //https://github.com/khoih-prog/TimerInterrupt
@@ -69,7 +68,8 @@ int secPrec = 0;
 volatile int ptrElement = 0;
 
 tmElements_t tm;
-Adafruit_SSD1306 lcd;
+
+SSD1306AsciiWire oled;  //afficheur oled;
 
 
 void setup() {
@@ -86,16 +86,15 @@ void setup() {
   Serial.println(TIMER_INTERRUPT_VERSION);
   Serial.print(F("CPU Frequency = ")); Serial.print(F_CPU / 1000000); Serial.println(F(" MHz"));
 
-  lcd.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3C (for the 128x32)
-  lcd.clearDisplay();
-  lcd.setTextSize(2);
-  lcd.setTextColor(WHITE);
-  lcd.setCursor(0, 0);
-  lcd.println(F("WSPR"));
-  lcd.setCursor(0, 16);    //x y
-  lcd.print(F("F4GOH 2020"));
-  lcd.display();
-  delay(1000);
+  oled.begin(&Adafruit128x64, 0x3C);
+  oled.setFont(TimesNewRoman16_bold);
+  oled.clear();
+  oled.setCursor(5, 0);
+  oled.println(F("WSPR"));
+  oled.setCursor(10, 3);   //x y
+  oled.print(F("F4GOH 2021"));
+  delay(3000);
+  oled.clear();
 
   // Select Timer 1-2 for UNO, 0-5 for MEGA
   // Timer 2 is 8-bit timer, only for higher frequency
@@ -147,20 +146,17 @@ void displayTime(bool tx) {
   Serial.print(tm.Minute);
   Serial.print(":");
   Serial.println(tm.Second);
-  lcd.clearDisplay();
-  lcd.setCursor(0, 0);
-  lcd.setTextSize(2);
   char heure[10];
   sprintf(heure, "%02d:%02d:%02d", tm.Hour, tm.Minute, tm.Second);
-  lcd.print(heure);
+  oled.setFont(fixednums15x31);
+  oled.setCursor(0, 0);
+  oled.print(heure);
   if (tx) {
-    lcd.setCursor(0, 16);
-    lcd.print("TX");
-    lcd.setTextSize(1);
-    lcd.setCursor(30, 20);
-    lcd.print(FREQUENCY);      
-  }
-  lcd.display();
+    oled.setFont(TimesNewRoman16_bold);
+    oled.setCursor(10, 6);
+    oled.print("TX: ");    
+    oled.print(FREQUENCY);
+  }  
 }
 
 boolean syncMinutes(int m) {
@@ -185,7 +181,7 @@ void txWspr() {
     RTC.read(tm);
     if (secPrec != tm.Second) {
       Serial.print(ptrElement);
-      Serial.print(',');      
+      Serial.print(',');
       displayTime(true);
       secPrec = tm.Second;
     }

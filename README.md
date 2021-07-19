@@ -4,6 +4,8 @@
 
 *f4goh@orange.fr*
 
+**Add FST4W and new library for OLED**
+
 ![wspr](img/IMG_20190323_135115.jpg  "wspr finsished")
 
 ## Wiring ##
