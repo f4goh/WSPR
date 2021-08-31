@@ -73,7 +73,8 @@ SSD1306AsciiWire oled;  //afficheur oled;
 #define GAIN 6  //pwm output pinout to adjust gain (mos polarization)
 //#define FREQUENCY 475700  //base freq
 //#define FREQUENCY 1838100  //base freq
-#define FREQUENCY 7040100
+#define FREQUENCY 3570100  //base freq 
+//#define FREQUENCY 7040100
 #define FST4W_MODE                0       //120           
 #define FSTW4_INTERVAL            120  //2 minutes
 #define FST4W_SYMBOL_COUNT        160
@@ -106,10 +107,10 @@ const uint8_t  FST4Wsymbols[FST4W_SYMBOL_COUNT] = {
 
 
 float toneSpacing[4] = {
-  1.46,  // 120
-  0.56,  // 300
-  0.180, // 900
-  0.089  // 1800
+  1.464,  // 120
+  0.558,  // 300
+  0.1803, // 900
+  0.08929  // 1800
 };
 
 // Load WSPR/FST4W symbol length

@@ -96,11 +96,12 @@ const uint8_t  FST4Wsymbols[FST4W_SYMBOL_COUNT] = {
 };
 
 float toneSpacing[4] = {
-  1.46,  // 120
-  0.56,  // 300
-  0.180, // 900
-  0.089  // 1800
+  1.464,  // 120
+  0.558,  // 300
+  0.1803, // 900
+  0.08929  // 1800
 };
+
 
 // Load WSPR/FST4W symbol length
 unsigned int symbolLength[4] = {
@@ -215,7 +216,7 @@ void sendfst4w(long freq) {
 
   int a = 0;
   for (int element = 0; element < FST4W_SYMBOL_COUNT; element++) {    // For each element in the message
-    a = int(FST4Wsymbols[element]); //   get the numerical ASCII Code
+    a = float(FST4Wsymbols[element]); //   get the numerical ASCII Code
     setfreq((double) freq + (double) toneSpacing[FST4W_MODE] * a, 0);
     delay(symbolLength[FST4W_MODE]);
     Serial.print(a);
