@@ -9,32 +9,36 @@
   use fst4sim.exe in C:\WSJT\wsjtx\bin to generate symbols under console
   or into wspr/software directory (https://github.com/f4goh/WSPR)
   exemple :
-  fst4sim "F4GOH JN07 20" 60 1500 0.0 0.1 1.0 10 -15 F > FST4W_message.txt"
+  fst4sim "F4GOH JN07 20" 120 1500 0.0 0 0 0 0 F > FST4W_message.txt
   result in FST4W_message.txt
 
   Message: F4GOH JN07 20                         W: F iwspr: 1
   f0: 1500.000   DT:  0.00   TxT:  51.8   SNR: -15.0
 
-  Message bits:
-  00001000110111010011000000101000100011000110011000101110101000101101010010000 000000000000000000000000
+  Message: F4GOH JN07 20                         W: F iwspr: 1
+f0: 1500.000   DT:  0.00   TxT: 109.3   SNR:   0.0
 
-  Channel symbols: add comma in FST4Wsymbols array below
-  0132102330
-  3303100221
-  3130310103
-  1300301123
-  1032010312
-  1232110013
-  3130023120
-  3022120132
-  1023030322
-  0102010022
-  3130211301
-  0322231032
-  0100321202
-  2030013330
-  0013211002
-  0201321023
+Message bits: 
+00001000110111010011000000101000100011000110011000101110101000101101010010000 000000000000000000000000
+
+Channel symbols: 
+0132102300
+3021210200
+0330302013
+1303233323
+1032010321
+1032021303
+2102011002
+1322330132
+1023123000
+1102202303
+1212001213
+0020231032
+0101320332
+3012011111
+3002222131
+1101321023
+
 
   FST4W_MODE  (only 120 to 1800) in beacon
         0 = FST4W 120
@@ -67,8 +71,9 @@ SSD1306AsciiWire oled;  //afficheur oled;
 #define FQ_UD 10
 #define RESET 9  // or 10
 #define GAIN 6  //pwm output pinout to adjust gain (mos polarization)
-#define FREQUENCY 475700  //base freq  
-//#define FREQUENCY 7040100
+//#define FREQUENCY 475700  //base freq
+//#define FREQUENCY 1838100  //base freq
+#define FREQUENCY 7040100
 #define FST4W_MODE                0       //120           
 #define FSTW4_INTERVAL            120  //2 minutes
 #define FST4W_SYMBOL_COUNT        160
@@ -150,7 +155,7 @@ void loop() {
     Serial.println(c);
     debug(c);
   }
-  
+
   RTC.read(tm);
 
   if ((tm.Minute % (FSTW4_INTERVAL / 60)) == 0 && tm.Second == 0) {
@@ -170,7 +175,7 @@ void loop() {
     secPrec = tm.Second;
     if (tm.Second % 2 == 0) digitalWrite(LED, digitalRead(LED) ^ 1);
   }
-  
+
   delay(10);
 }
 
@@ -269,7 +274,7 @@ void sendfst4w(long freq) {
   analogWrite(GAIN, PWM_GAIN);
   int a = 0;
   for (int element = 0; element < FST4W_SYMBOL_COUNT; element++) {    // For each element in the message
-    a = int(FST4Wsymbols[element]); //   get the numerical ASCII Code
+    a = double(FST4Wsymbols[element]); //   get the numerical ASCII Code
     setfreq((double) freq + (double) toneSpacing[FST4W_MODE] * a, 0);
     delay(symbolLength[FST4W_MODE]);
     Serial.print(a);

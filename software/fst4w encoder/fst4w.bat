@@ -1,1 +1,1 @@
-fst4sim "F4GOH JN07 20" 60 1500 0.0 0.1 1.0 10 -15 F > FST4W_message.txt"
+fst4sim "F4GOH JN07 20" 120 1500 0.0 0 0 0 0 F > FST4W_message.txt"
